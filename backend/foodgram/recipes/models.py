@@ -32,7 +32,7 @@ class Tag(models.Model):
         return self.name
 
 
-class Ingredients(models.Model):
+class Ingredient(models.Model):
     name = models.CharField(
         'Название ингредиента',
         max_length=200,
@@ -41,7 +41,6 @@ class Ingredients(models.Model):
         'Единица измерения',
         max_length=200,
     )
-    
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -58,24 +57,28 @@ class Recipe(models.Model):
     )
     text = models.CharField(
         'Описание',
-        max_length = 1000,
+        max_length=1000,
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='recipes',
-        verbose_name = 'Автор'
+        verbose_name='Автор',
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         Tag,
         related_name='recipes',
-        verbose_name='Теги'
+        verbose_name='Теги',
     )
     ingredients = models.ManyToManyField(
-        Ingredients,
-        through='RecipeIngredients',
+        Ingredient,
+        through='IngredientInRecipe',
         related_name='ingredients',
         verbose_name='Ингредиенты'
+    )
+    image = models.ImageField(
+        'Картинка',
+        upload_to='recipes/'
     )
     is_favorite = models.BooleanField(
         'В избранном',
@@ -91,7 +94,6 @@ class Recipe(models.Model):
         'Время приготовления',
     )
 
-
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
@@ -100,26 +102,14 @@ class Recipe(models.Model):
         return self.name
 
 
-# class RecipeTag(models.Model):
-#     recipe = models.ForeignKey(
-#         Recipe,
-#         on_delete=models.CASCADE,
-#     )
-#     tag = models.ForeignKey(
-#         Tag,
-#         on_delete=models.CASCADE
-#     )
-
-class RecipeIngredients(models.Model):
+class IngredientInRecipe(models.Model):
     recipe = models.ForeignKey(
-        Recipe, 
-        related_name='recipe_ingredients',
+        Recipe,
         on_delete=models.CASCADE
     )
     ingredients = models.ForeignKey(
-        Ingredients,
+        Ingredient,
         on_delete=models.CASCADE,
-        related_name='recipe_ingredients',
         verbose_name='Ингредиенты',
     )
     amount = models.PositiveIntegerField(
@@ -131,3 +121,30 @@ class RecipeIngredients(models.Model):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
+
+class FavoriteRecipe(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = 'Избранное'
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = 'Список покупок'

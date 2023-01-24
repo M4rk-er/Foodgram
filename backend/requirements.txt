@@ -1,9 +1,15 @@
 asgiref==3.6.0
-Django==3.1.14
+Django==3.1.4
 django-templated-mail==1.1.1
 django-utils-six==2.0
 djangorestframework==3.14.0
 djoser==2.0.1
+drf-extra-fields==3.4.1
+flake8==6.0.0
+isort==5.11.4
+Pillow==9.4.0
 psycopg2-binary==2.8.6
+pycodestyle==2.10.0
+pyflakes==3.0.1
 pytz==2022.7
 sqlparse==0.4.3

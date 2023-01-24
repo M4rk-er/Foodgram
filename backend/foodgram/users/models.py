@@ -2,12 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .validators import username_validator
 
-# Перенести max_lenght в settings
 
 class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
-    
     username = models.CharField(
         'Имя пользователя',
         max_length=100,
@@ -26,3 +24,19 @@ class User(AbstractUser):
         'Фамилия',
         max_length=50
     )
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following'
+    )
+
+    def __str__(self):
+        return str(self.author)

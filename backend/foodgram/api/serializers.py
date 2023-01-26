@@ -1,13 +1,14 @@
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import (FavoriteRecipe, Ingredient, IngredientInRecipe,
-                            Recipe, ShoppingCart, Tag)
 from rest_framework import serializers, status
 from rest_framework.validators import ValidationError
+
 from users.models import Follow, User
+from recipes.models import (FavoriteRecipe, Ingredient, IngredientInRecipe,
+                            Recipe, ShoppingCart, Tag)
 
 
 class UserSerializer(serializers.ModelSerializer):
-    '''Сериализатор регистрации/получения информации пользователя.'''
+    """Сериализатор регистрации/получения информации пользователя."""
     is_subscribed = serializers.SerializerMethodField(
         method_name='get_is_subscribed')
 
@@ -45,7 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PasswordSerializer(serializers.Serializer):
-    '''Сериализатор смены пароля.'''
+    """Сериализатор смены пароля."""
     new_password = serializers.CharField(max_length=150)
     current_password = serializers.CharField(max_length=150)
 
@@ -57,7 +58,7 @@ class PasswordSerializer(serializers.Serializer):
 
 
 class FollowSerializer(UserSerializer):
-    '''Сериализатор подписки/отписки на пользователя.'''
+    """Сериализатор подписки/отписки на пользователя."""
     is_subscribed = serializers.SerializerMethodField(
         method_name='get_is_subscribed'
     )
@@ -113,14 +114,14 @@ class FollowSerializer(UserSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    '''Сериализатор получения информации об ингредиенте.'''
+    """Сериализатор получения информации об ингредиенте."""
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit',)
 
 
 class TagSerializer(serializers.ModelSerializer):
-    '''Сериализатор получения информации о теге.'''
+    """Сериализатор получения информации о теге."""
     class Meta:
         model = Tag
         fields = (
@@ -129,14 +130,14 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class RecipeFavoriteSerializer(serializers.ModelSerializer):
-    '''Сериализатор отображения рецепта при добавление в избранное.'''
+    """Сериализатор отображения рецепта при добавление в избранное."""
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class CreateIngredientInRecipeSerializer(serializers.ModelSerializer):
-    '''Сериализатор для создание ингредиентов в рецепте.'''
+    """Сериализатор для создание ингредиентов в рецепте."""
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(),
         required=True,
@@ -153,7 +154,7 @@ class CreateIngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class GetIngredientInRecipeSerializer(serializers.ModelSerializer):
-    '''Сериализатор получения ингредиента из рецепта.'''
+    """Сериализатор получения ингредиента из рецепта."""
     id = serializers.SerializerMethodField(method_name='get_id')
     name = serializers.SerializerMethodField(method_name='get_name')
     measurement_unit = serializers.SerializerMethodField(
@@ -179,7 +180,7 @@ class GetIngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class GetRecipeSerializer(serializers.ModelSerializer):
-    '''Сериализатор получения рецепта.'''
+    """Сериализатор получения рецепта."""
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     ingredients = GetIngredientInRecipeSerializer(
@@ -223,7 +224,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
-    '''Сериализатор создания рецепта.'''
+    """Сериализатор создания рецепта."""
     ingredients = CreateIngredientInRecipeSerializer(
         many=True, required=True, source='ingredientinrecipe_set'
     )
@@ -251,24 +252,24 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         ingredients_data = validated_data.pop('ingredientinrecipe_set')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tag_data)
-        for ingredient in ingredients_data:
-            IngredientInRecipe.objects.create(
-                recipe=recipe,
-                ingredients=ingredient.get('ingredients'),
-                amount=int(ingredient.pop('amount'))
-            )
+        IngredientInRecipe.objects.bulk_create(
+                IngredientInRecipe(
+                    recipe=recipe,
+                    ingredients=ingredient.get('ingredients'),
+                    amount=int(ingredient.pop('amount'))
+            ) for ingredient in ingredients_data)
         return recipe
 
     def update(self, instance, validated_data):
         if 'ingredientinrecipe_set' in validated_data:
             instance.ingredients.all().delete()
             ingredients_data = validated_data.get('ingredientinrecipe_set')
-            for ingredient in ingredients_data:
-                IngredientInRecipe.objects.create(
+            IngredientInRecipe.objects.bulk_create(
+                IngredientInRecipe(
                     recipe=instance,
                     ingredients=ingredient.get('ingredients'),
                     amount=int(ingredient.pop('amount'))
-                )
+            ) for ingredient in ingredients_data)
 
         if 'tags' in validated_data:
             instance.tags.set(validated_data['tags'])

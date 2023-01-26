@@ -25,6 +25,12 @@ class User(AbstractUser):
         max_length=50
     )
 
+    class Meta:
+        ordering = ('username',)
+
+    def __str__(self):
+        return self.username
+
 
 class Follow(models.Model):
     user = models.ForeignKey(
@@ -37,6 +43,9 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
         related_name='following'
     )
+
+    class Meta:
+        ordering = ('-author_id',)
 
     def __str__(self):
         return str(self.author)

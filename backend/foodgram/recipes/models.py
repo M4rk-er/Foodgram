@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import User
 
@@ -27,6 +28,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ('id',)
 
     def __str__(self):
         return self.name
@@ -45,6 +47,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -92,11 +95,16 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveIntegerField(
         'Время приготовления',
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(10000)
+        ]
     )
 
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -114,12 +122,17 @@ class IngredientInRecipe(models.Model):
     )
     amount = models.PositiveIntegerField(
         default=1,
-        verbose_name='Количество'
+        verbose_name='Количество',
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(50000)
+        ]
     )
 
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ('recipe_id',)
 
 
 class FavoriteRecipe(models.Model):
@@ -134,6 +147,7 @@ class FavoriteRecipe(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
+        ordering = ('user_id',)
 
 
 class ShoppingCart(models.Model):
@@ -148,3 +162,4 @@ class ShoppingCart(models.Model):
 
     class Meta:
         verbose_name = 'Список покупок'
+        ordering = ('user_id',)

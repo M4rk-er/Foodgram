@@ -4,6 +4,7 @@ from .models import Recipe, Ingredient, Tag, IngredientInRecipe
 
 class IngredientInline(admin.TabularInline):
     model = IngredientInRecipe
+    min_num = 1
 
 
 @admin.register(Tag)

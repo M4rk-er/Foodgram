@@ -1,5 +1,6 @@
 version: '3.8'
 services:
+
   db:
     image: postgres:13.0-alpine
     volumes:
@@ -7,16 +8,20 @@ services:
     restart: always
     env_file:
       - ./.env
+
   backend:
-    image: m4rkerb/foodgram:latest
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/app/static/
-      - static_value:/app/media/
+      - media_value:/app/media/
     depends_on:
       - db
     env_file:
       - ./.env
+
   frontend:
     build:
       context: ../frontend
@@ -25,6 +30,7 @@ services:
       - ../frontend/:/app/result_build/
     depends_on:
       - backend
+
   nginx:
     image: nginx:1.21.3-alpine
     ports:

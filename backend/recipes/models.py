@@ -81,7 +81,8 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         'Картинка',
-        upload_to='recipes/'
+        upload_to='recipes/',
+        max_length=10485760
     )
     is_favorite = models.BooleanField(
         'В избранном',

@@ -1,4 +1,5 @@
 import re
+
 from django.core.exceptions import ValidationError
 
 PATTERN = r'^[-a-zA-Z0-9_]+$'

@@ -128,7 +128,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True, methods=['post', 'delete'],
-        url_name='favorites', url_path='favorites',
+        url_name='favorite', url_path='favorite',
         permission_classes=(IsAuthenticated,)
     )
     def favorite(self, request, *args, **kwargs):

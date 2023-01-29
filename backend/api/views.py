@@ -150,9 +150,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 FavoriteRecipe.objects.get(user=user, recipe=recipe).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(
-                    {'errors': 'Рецепт не был добавлен в избранное'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                {'errors': 'Рецепт не был добавлен в избранное'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(
         detail=True, methods=['post', 'delete'],
@@ -178,9 +178,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 ShoppingCart.objects.get(user=user, recipe=recipe).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(
-                    {'errors': 'Рецепт не был добавлен в список покупок'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                {'errors': 'Рецепт не был добавлен в список покупок'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(
         detail=False, methods=['get'],
@@ -194,7 +194,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .values(
                 'recipe__ingredients__name',
                 'recipe__ingredients__measurement_unit'
-                )
+            )
             .annotate(Sum('recipe__ingredientinrecipe__amount'))
             .order_by('recipe__ingredients__name')
         )

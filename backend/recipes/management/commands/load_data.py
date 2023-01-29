@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from recipes.models import Ingredient
 import csv
 
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         with open('./static/data/ingredients.csv', encoding='utf-8') as f:

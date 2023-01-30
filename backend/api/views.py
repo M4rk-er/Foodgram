@@ -57,7 +57,7 @@ class UserViewSet(viewsets.ModelViewSet):
         )
 
     @action(
-        detail=True, methods=['post', 'delete',],
+        detail=True, methods=['post', 'delete'],
         url_name='subscribe', url_path='subscribe',
         permission_classes=(IsAuthenticated,)
     )
@@ -72,7 +72,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serilalizer.is_valid(raise_exception=True)
             Follow.objects.create(user=user, author=author)
             return Response(serilalizer.data, status=status.HTTP_201_CREATED)
-        
+
         if request.method == 'DELETE':
             follow = get_object_or_404(Follow, user=user, author=author)
             self.perform_destroy(follow)

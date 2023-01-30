@@ -72,11 +72,9 @@ class UserViewSet(viewsets.ModelViewSet):
             serilalizer.is_valid(raise_exception=True)
             Follow.objects.create(user=user, author=author)
             return Response(serilalizer.data, status=status.HTTP_201_CREATED)
-
-        if request.method == 'DELETE':
-            follow = get_object_or_404(Follow, user=user, author=author)
-            follow.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        follow = get_object_or_404(Follow, user=user, author=author)
+        self.perform_destroy(follow)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         methods=['get'], url_name='subscriptions',

@@ -1,6 +1,7 @@
-from django_filters import FilterSet, CharFilter
+from django_filters import CharFilter, FilterSet
 
 from recipes.models import Ingredient
+
 
 class IngredientFilter(FilterSet):
     name = CharFilter(lookup_expr='istartswith')

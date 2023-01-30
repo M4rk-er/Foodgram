@@ -1,7 +1,8 @@
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, mixins, status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,6 +11,7 @@ from recipes.models import (FavoriteRecipe, Ingredient, Recipe, ShoppingCart,
                             Tag)
 from users.models import Follow, User
 
+from .filters import IngredientFilter
 from .pagination import CustomPagination
 from .permissions import CustomUserPermissions, IsAuthor, IsAuthorOrReadOnly
 from .serializers import (CreateRecipeSerializer, FollowSerializer,
@@ -104,8 +106,8 @@ class IngredientViewSet(mixins.ListModelMixin,
                         viewsets.GenericViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -151,7 +153,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         author_id = self.request.query_params.get('author')
         if author_id is not None:
-            queryset = queryset.filter(user=author_id)
+            queryset = queryset.filter(author_id=author_id).all()
 
         return queryset
 

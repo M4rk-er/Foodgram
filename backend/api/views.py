@@ -115,8 +115,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrReadOnly,)
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     pagination_class = CustomPagination
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('tags', 'author')
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PUT', 'PATCH']:
@@ -146,6 +144,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(shopping_cart__in=shopping_cart)
         if is_in_shopping_cart == '0':
             queryset = queryset.exclude(shopping_cart__in=shopping_cart)
+
+        tags = self.request.query_params.getlist('tags')
+        if tags is not None:
+            slug = Tag.objects.filter(slug__in=tags).all()
+            queryset = queryset.filter(tags__in=slug)
+
+        author_id = self.request.query_params.get('author')
+        if author_id is not None:
+            queryset = queryset.filter(user=author_id)
 
         return queryset
 

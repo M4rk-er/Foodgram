@@ -83,7 +83,7 @@ class Recipe(models.Model):
         upload_to='recipes/',
         max_length=10485760
     )
-    is_favorite = models.BooleanField(
+    is_favorited = models.BooleanField(
         'В избранном',
         blank=True,
         default=False,

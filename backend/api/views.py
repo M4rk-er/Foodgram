@@ -1,6 +1,7 @@
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -114,6 +115,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrReadOnly,)
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     pagination_class = CustomPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('tags', 'author')
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PUT', 'PATCH']:
@@ -125,6 +128,26 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save()
+
+    def get_queryset(self):
+        queryset = Recipe.objects.all()
+        user = self.request.user
+
+        is_favorited = self.request.query_params.get('is_favorited')
+        favorited = FavoriteRecipe.objects.filter(user=user)
+        if is_favorited == '1':
+            queryset = queryset.filter(favoriterecipe__in=favorited)
+        if is_favorited == '0':
+            queryset = queryset.exclude(favoriterecipe__in=favorited)
+
+        is_in_shopping_cart = self.request.query_params.get('is_in_shopping_cart')
+        shopping_cart = ShoppingCart.objects.filter(user=user)
+        if is_in_shopping_cart == '1':
+            queryset = queryset.filter(shopping_cart__in=shopping_cart)
+        if is_in_shopping_cart == '0':
+            queryset = queryset.exclude(shopping_cart__in=shopping_cart)
+
+        return queryset
 
     @action(
         detail=True, methods=['post', 'delete'],

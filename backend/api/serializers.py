@@ -10,7 +10,8 @@ from users.models import Follow, User
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор регистрации/получения информации пользователя."""
     is_subscribed = serializers.SerializerMethodField(
-        method_name='get_is_subscribed')
+        method_name='get_is_subscribed'
+    )
 
     def create(self, validated_data):
         user = User(

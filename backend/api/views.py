@@ -25,7 +25,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPagination
     permission_classes = (CustomUserPermissions,)
-    http_method_names = ['get', 'post']
+    http_method_names = ['get', 'post', 'delete']
 
     @action(
         detail=False, methods=['get'],
@@ -57,7 +57,7 @@ class UserViewSet(viewsets.ModelViewSet):
         )
 
     @action(
-        detail=True, methods=['post', 'delete'],
+        detail=True, methods=['post', 'delete',],
         url_name='subscribe', url_path='subscribe',
         permission_classes=(IsAuthenticated,)
     )
@@ -72,9 +72,11 @@ class UserViewSet(viewsets.ModelViewSet):
             serilalizer.is_valid(raise_exception=True)
             Follow.objects.create(user=user, author=author)
             return Response(serilalizer.data, status=status.HTTP_201_CREATED)
-        follow = get_object_or_404(Follow, user=user, author=author)
-        self.perform_destroy(follow)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        
+        if request.method == 'DELETE':
+            follow = get_object_or_404(Follow, user=user, author=author)
+            self.perform_destroy(follow)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         methods=['get'], url_name='subscriptions',
@@ -110,15 +112,14 @@ class IngredientViewSet(mixins.ListModelMixin,
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = GetRecipeSerializer
     permission_classes = (IsAuthorOrReadOnly,)
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     pagination_class = CustomPagination
 
     def get_serializer_class(self):
-        if self.request.method in ['POST', 'PUT', 'PATCH']:
-            return CreateRecipeSerializer
-        return GetRecipeSerializer
+        if self.request.method in ['GET']:
+            return GetRecipeSerializer
+        return CreateRecipeSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

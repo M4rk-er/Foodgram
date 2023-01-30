@@ -149,7 +149,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         tags = self.request.query_params.getlist('tags')
         if tags is not None:
             slug = Tag.objects.filter(slug__in=tags).all()
-            queryset = queryset.filter(tags__in=slug)
+            recipes = Tag.objects.filter(tag__in=slug).values('recipe__id').distinct()
+            queryset = queryset.filter(id__in=recipes)
 
         author_id = self.request.query_params.get('author')
         if author_id is not None:

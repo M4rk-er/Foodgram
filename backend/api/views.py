@@ -129,6 +129,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Recipe.objects.all()
         user = self.request.user
+        
+        if not self.request.query_params:
+            return queryset
 
         is_favorited = self.request.query_params.get('is_favorited')
         if is_favorited == '1':

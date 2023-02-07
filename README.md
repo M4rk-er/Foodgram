@@ -49,17 +49,12 @@ docker-compose exec backend python manage.py migrate
 
 - Создать суперпользователя:
 ``` 
-docker-compose exec backend python3 manage.py createsuperuser 
+docker-compose exec backend python manage.py createsuperuser 
 ```
 
 - Собрать staticfiles:
 ``` 
-docker-compose exec backend python3 manage.py collectstatic --noinput 
+docker-compose exec backend python manage.py collectstatic --noinput 
 ```
 
 ### После запуска проект будет доступен по адресу localhost, [панель администратора](localhost/admin/)
-
-# http://158.160.37.167/
-
-## email: admin@admin.ru
-## password: admin

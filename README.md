@@ -58,3 +58,4 @@ docker-compose exec backend python manage.py collectstatic --noinput
 ```
 
 ### После запуска проект будет доступен по адресу localhost, [панель администратора](localhost/admin/)
+
